@@ -16,11 +16,30 @@ var stopwords = []string{
 	"these", "they", "this", "to", "was", "will", "with",
 }
 
-var symbols = []string{tokenPlus.String(), tokenMinus.String(), tokenLParen.String(), tokenRParen.String(), tokenWildcard.String(), tokenTilde.String(), notSymbol}
+type tokenLiteral string
+
+const (
+	tokenLiteralPlus     tokenLiteral = "+"
+	tokenLiteralMinus    tokenLiteral = "-"
+	tokenLiteralNot      tokenLiteral = "NOT"
+	tokenLiteralAnd      tokenLiteral = "AND"
+	tokenLiteralOr       tokenLiteral = "OR"
+	tokenLiteralLParen   tokenLiteral = "("
+	tokenLiteralRParen   tokenLiteral = ")"
+	tokenLiteralWildcard tokenLiteral = "*"
+	tokenLiteralTilde    tokenLiteral = "~"
+
+	tokenLiteralNotSymbol tokenLiteral = "!"
+)
+
+func (t tokenLiteral) String() string {
+	return string(t)
+}
+
+var symbols = []tokenLiteral{tokenLiteralPlus, tokenLiteralMinus, tokenLiteralLParen, tokenLiteralRParen, tokenLiteralWildcard, tokenLiteralTilde, tokenLiteralNotSymbol}
 
 type token int
 
-const notSymbol = "!"
 const (
 	tokenWord token = iota
 	tokenPhrase
@@ -42,58 +61,58 @@ func (t token) String() string {
 	case tokenPhrase:
 		return "<phrase>"
 	case tokenPlus:
-		return "+"
+		return tokenLiteralPlus.String()
 	case tokenMinus:
-		return "-"
+		return tokenLiteralMinus.String()
 	case tokenNot:
-		return "NOT"
+		return tokenLiteralNot.String()
 	case tokenAnd:
-		return "AND"
+		return tokenLiteralAnd.String()
 	case tokenOr:
-		return "OR"
+		return tokenLiteralOr.String()
 	case tokenLParen:
-		return "("
+		return tokenLiteralLParen.String()
 	case tokenRParen:
-		return ")"
+		return tokenLiteralRParen.String()
 	case tokenWildcard:
-		return "*"
+		return tokenLiteralWildcard.String()
 	case tokenTilde:
-		return "~"
+		return tokenLiteralTilde.String()
 	}
 
 	panic("unreachable")
 }
 
-func newToken(s string) TokenData {
+func newToken(s string) tokenData {
 	switch s {
-	case tokenPlus.String():
-		return TokenData{token: tokenPlus}
-	case tokenMinus.String():
-		return TokenData{token: tokenMinus}
-	case tokenNot.String(), notSymbol:
-		return TokenData{token: tokenNot}
-	case tokenAnd.String():
-		return TokenData{token: tokenAnd}
-	case tokenOr.String():
-		return TokenData{token: tokenOr}
-	case tokenLParen.String():
-		return TokenData{token: tokenLParen}
-	case tokenRParen.String():
-		return TokenData{token: tokenRParen}
-	case tokenWildcard.String():
-		return TokenData{token: tokenWildcard}
-	case tokenTilde.String():
-		return TokenData{token: tokenTilde}
+	case tokenLiteralPlus.String():
+		return tokenData{token: tokenPlus}
+	case tokenLiteralMinus.String():
+		return tokenData{token: tokenMinus}
+	case tokenLiteralNot.String(), tokenLiteralNotSymbol.String():
+		return tokenData{token: tokenNot}
+	case tokenLiteralAnd.String():
+		return tokenData{token: tokenAnd}
+	case tokenLiteralOr.String():
+		return tokenData{token: tokenOr}
+	case tokenLiteralLParen.String():
+		return tokenData{token: tokenLParen}
+	case tokenLiteralRParen.String():
+		return tokenData{token: tokenRParen}
+	case tokenLiteralWildcard.String():
+		return tokenData{token: tokenWildcard}
+	case tokenLiteralTilde.String():
+		return tokenData{token: tokenTilde}
 	}
 
 	if strings.HasPrefix(s, "\"") && strings.HasSuffix(s, "\"") {
-		return TokenData{tokenPhrase, s}
+		return tokenData{tokenPhrase, s}
 	}
 
-	return TokenData{tokenWord, s}
+	return tokenData{tokenWord, s}
 }
 
-type TokenData struct {
+type tokenData struct {
 	token token
 	data  string
 }
@@ -118,7 +137,7 @@ func trim(runes []rune) []rune {
 	return runes[from:]
 }
 
-func (t *tokeniser) next() TokenData {
+func (t *tokeniser) next() tokenData {
 	t.expr = trim(t.expr)
 
 	to := 0
@@ -142,12 +161,12 @@ func (t *tokeniser) next() TokenData {
 		// phrase := string(t.expr[:to+2])
 
 		t.expr = t.expr[to+2:]
-		return TokenData{tokenPhrase, phrase}
+		return tokenData{tokenPhrase, phrase}
 	}
 
 token:
 	for i, r := range t.expr {
-		if slices.Contains(symbols, string(r)) {
+		if slices.Contains(symbols, tokenLiteral(r)) {
 			break
 		}
 

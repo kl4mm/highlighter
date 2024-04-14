@@ -9,40 +9,40 @@ func Test_Tokeniser_Next(t *testing.T) {
 	tcs := []struct {
 		input string
 		n     int
-		want  []TokenData
+		want  []tokenData
 	}{
-		{"lorem", 1, []TokenData{{tokenWord, "lorem"}}},
-		{"AND", 1, []TokenData{{token: tokenAnd}}},
-		{"  AND   ", 1, []TokenData{{token: tokenAnd}}},
-		{"  AND", 1, []TokenData{{token: tokenAnd}}},
-		{"OR", 1, []TokenData{{token: tokenOr}}},
-		{"\"lorem ipsum\"", 1, []TokenData{{tokenPhrase, "lorem ipsum"}}},
-		{"  \"lorem ipsum\"", 1, []TokenData{{tokenPhrase, "lorem ipsum"}}},
-		{"  \"lorem ipsum\"  ", 1, []TokenData{{tokenPhrase, "lorem ipsum"}}},
-		{"-lorem", 1, []TokenData{{token: tokenMinus}}},
-		{"NOT lorem", 1, []TokenData{{token: tokenNot}}},
-		{"!lorem", 1, []TokenData{{token: tokenNot}}},
-		{"~lorem", 1, []TokenData{{token: tokenTilde}}},
-		{"lorem*", 1, []TokenData{{tokenWord, "lorem"}}},
-		{"lorem*", 2, []TokenData{{tokenWord, "lorem"}, {token: tokenWildcard}}},
-		{"(lorem", 1, []TokenData{{token: tokenLParen}}},
-		{")lorem", 1, []TokenData{{token: tokenRParen}}},
-		{")lorem", 2, []TokenData{{token: tokenRParen}, {tokenWord, "lorem"}}},
-		{"~lorem", 1, []TokenData{{token: tokenTilde}}},
-		{"~lorem", 2, []TokenData{{token: tokenTilde}, {tokenWord, "lorem"}}},
-		{"~\"lorem\"", 2, []TokenData{{token: tokenTilde}, {tokenPhrase, "lorem"}}},
-		{"lorem AND ipsum", 3, []TokenData{{tokenWord, "lorem"}, {token: tokenAnd}, {tokenWord, "ipsum"}}},
-		{"   lorem    AND    ipsum   ", 3, []TokenData{{tokenWord, "lorem"}, {token: tokenAnd}, {tokenWord, "ipsum"}}},
-		{"\"lorem\" AND \"ipsum\"", 3, []TokenData{{tokenPhrase, "lorem"}, {token: tokenAnd}, {tokenPhrase, "ipsum"}}},
-		{"(\"lorem\" AND \"ipsum\") OR (lorem OR ipsum)", 11, []TokenData{{token: tokenLParen}, {tokenPhrase, "lorem"}, {token: tokenAnd}, {tokenPhrase, "ipsum"}, {token: tokenRParen}, {token: tokenOr}, {token: tokenLParen}, {tokenWord, "lorem"}, {token: tokenOr}, {tokenWord, "ipsum"}, {token: tokenRParen}}},
-		{"\"lorem AND", 2, []TokenData{{tokenWord, "lorem"}, {token: tokenAnd}}},
+		{"lorem", 1, []tokenData{{tokenWord, "lorem"}}},
+		{"AND", 1, []tokenData{{token: tokenAnd}}},
+		{"  AND   ", 1, []tokenData{{token: tokenAnd}}},
+		{"  AND", 1, []tokenData{{token: tokenAnd}}},
+		{"OR", 1, []tokenData{{token: tokenOr}}},
+		{"\"lorem ipsum\"", 1, []tokenData{{tokenPhrase, "lorem ipsum"}}},
+		{"  \"lorem ipsum\"", 1, []tokenData{{tokenPhrase, "lorem ipsum"}}},
+		{"  \"lorem ipsum\"  ", 1, []tokenData{{tokenPhrase, "lorem ipsum"}}},
+		{"-lorem", 1, []tokenData{{token: tokenMinus}}},
+		{"NOT lorem", 1, []tokenData{{token: tokenNot}}},
+		{"!lorem", 1, []tokenData{{token: tokenNot}}},
+		{"~lorem", 1, []tokenData{{token: tokenTilde}}},
+		{"lorem*", 1, []tokenData{{tokenWord, "lorem"}}},
+		{"lorem*", 2, []tokenData{{tokenWord, "lorem"}, {token: tokenWildcard}}},
+		{"(lorem", 1, []tokenData{{token: tokenLParen}}},
+		{")lorem", 1, []tokenData{{token: tokenRParen}}},
+		{")lorem", 2, []tokenData{{token: tokenRParen}, {tokenWord, "lorem"}}},
+		{"~lorem", 1, []tokenData{{token: tokenTilde}}},
+		{"~lorem", 2, []tokenData{{token: tokenTilde}, {tokenWord, "lorem"}}},
+		{"~\"lorem\"", 2, []tokenData{{token: tokenTilde}, {tokenPhrase, "lorem"}}},
+		{"lorem AND ipsum", 3, []tokenData{{tokenWord, "lorem"}, {token: tokenAnd}, {tokenWord, "ipsum"}}},
+		{"   lorem    AND    ipsum   ", 3, []tokenData{{tokenWord, "lorem"}, {token: tokenAnd}, {tokenWord, "ipsum"}}},
+		{"\"lorem\" AND \"ipsum\"", 3, []tokenData{{tokenPhrase, "lorem"}, {token: tokenAnd}, {tokenPhrase, "ipsum"}}},
+		{"(\"lorem\" AND \"ipsum\") OR (lorem OR ipsum)", 11, []tokenData{{token: tokenLParen}, {tokenPhrase, "lorem"}, {token: tokenAnd}, {tokenPhrase, "ipsum"}, {token: tokenRParen}, {token: tokenOr}, {token: tokenLParen}, {tokenWord, "lorem"}, {token: tokenOr}, {tokenWord, "ipsum"}, {token: tokenRParen}}},
+		{"\"lorem AND", 2, []tokenData{{tokenWord, "lorem"}, {token: tokenAnd}}},
 	}
 
 	for _, tc := range tcs {
 		t.Run(tc.input, func(t *testing.T) {
 			tokeniser := newTokeniser(tc.input)
 
-			have := make([]TokenData, tc.n)
+			have := make([]tokenData, tc.n)
 			for i := 0; i < tc.n; i++ {
 				have[i] = tokeniser.next()
 			}

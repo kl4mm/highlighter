@@ -54,22 +54,25 @@ func Test_Tokeniser_Next(t *testing.T) {
 	}
 }
 
-func Test_Trim(t *testing.T) {
+func Test_SkipWhitespace(t *testing.T) {
 	tcs := []struct {
 		input string
 		want  string
 	}{
+		{"", ""},
+		{"    ", ""},
 		{"lorem epsum", "lorem epsum"},
 		{"   lorem epsum", "lorem epsum"},
 		{"\t\tlorem epsum", "lorem epsum"},
 		{"\t\nlorem epsum", "lorem epsum"},
 		{"\nlorem epsum", "lorem epsum"},
+		{"*", "*"},
 	}
 
 	for _, tc := range tcs {
 		t.Run(tc.input, func(t *testing.T) {
 			runes := []rune(tc.input)
-			have := trim(runes)
+			have := skipWhitespace(runes)
 			if string(have) != tc.want {
 				t.Errorf("Want: %s, Have: %s", tc.want, string(have))
 			}

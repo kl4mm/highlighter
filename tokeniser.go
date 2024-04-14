@@ -114,7 +114,7 @@ func newTokeniser(expr string) tokeniser {
 	return tokeniser{expr: []rune(expr)}
 }
 
-func trim(runes []rune) []rune {
+func skipWhitespace(runes []rune) []rune {
 	from := 0
 	for i, r := range runes {
 		from = i
@@ -123,11 +123,15 @@ func trim(runes []rune) []rune {
 		}
 	}
 
+	if len(runes) > 0 && runes[from] == ' ' {
+		from = len(runes)
+	}
+
 	return runes[from:]
 }
 
 func (t *tokeniser) next() tokenData {
-	t.expr = trim(t.expr)
+	t.expr = skipWhitespace(t.expr)
 
 	to := 0
 	if t.expr[0] == '"' {
@@ -172,6 +176,6 @@ token:
 }
 
 func (t *tokeniser) isEmpty() bool {
-	t.expr = trim(t.expr)
-	return len(t.expr) == 0 || t.expr[0] == ' '
+	t.expr = skipWhitespace(t.expr)
+	return len(t.expr) == 0
 }

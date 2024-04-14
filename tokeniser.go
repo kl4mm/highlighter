@@ -6,16 +6,6 @@ import (
 	"unicode"
 )
 
-// Accepts MATCH(column) against (expression)
-// Returns (i, len) pairs of matches
-// Optional apply (eg wrap in <b></b>, remove, replace etc)
-
-var stopwords = []string{
-	"a", "an", "and", "are", "as", "at", "be", "but", "by", "for", "if", "in", "into", "is",
-	"it", "no", "not", "of", "on", "or", "such", "that", "the", "their", "then", "there",
-	"these", "they", "this", "to", "was", "will", "with",
-}
-
 type tokenLiteral string
 
 const (
@@ -30,6 +20,10 @@ const (
 	tokenLiteralTilde    tokenLiteral = "~"
 
 	tokenLiteralNotSymbol tokenLiteral = "!"
+
+	// TODO: handle these:
+	tokenLiteralAndSymbol tokenLiteral = "&&"
+	tokenLiteralOrSymbol  tokenLiteral = "||"
 )
 
 func (t tokenLiteral) String() string {
@@ -44,7 +38,6 @@ const (
 	tokenWord token = iota
 	tokenPhrase
 	tokenPlus
-	tokenMinus
 	tokenNot
 	tokenAnd
 	tokenOr
@@ -62,8 +55,6 @@ func (t token) String() string {
 		return "<phrase>"
 	case tokenPlus:
 		return tokenLiteralPlus.String()
-	case tokenMinus:
-		return tokenLiteralMinus.String()
 	case tokenNot:
 		return tokenLiteralNot.String()
 	case tokenAnd:
@@ -87,9 +78,7 @@ func newToken(s string) tokenData {
 	switch s {
 	case tokenLiteralPlus.String():
 		return tokenData{token: tokenPlus}
-	case tokenLiteralMinus.String():
-		return tokenData{token: tokenMinus}
-	case tokenLiteralNot.String(), tokenLiteralNotSymbol.String():
+	case tokenLiteralNot.String(), tokenLiteralMinus.String(), tokenLiteralNotSymbol.String():
 		return tokenData{token: tokenNot}
 	case tokenLiteralAnd.String():
 		return tokenData{token: tokenAnd}

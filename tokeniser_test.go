@@ -19,7 +19,7 @@ func Test_Tokeniser_Next(t *testing.T) {
 		{"\"lorem ipsum\"", 1, []tokenData{{tokenPhrase, "lorem ipsum"}}},
 		{"  \"lorem ipsum\"", 1, []tokenData{{tokenPhrase, "lorem ipsum"}}},
 		{"  \"lorem ipsum\"  ", 1, []tokenData{{tokenPhrase, "lorem ipsum"}}},
-		{"-lorem", 1, []tokenData{{token: tokenMinus}}},
+		{"-lorem", 1, []tokenData{{token: tokenNot}}},
 		{"NOT lorem", 1, []tokenData{{token: tokenNot}}},
 		{"!lorem", 1, []tokenData{{token: tokenNot}}},
 		{"~lorem", 1, []tokenData{{token: tokenTilde}}},

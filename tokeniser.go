@@ -170,3 +170,8 @@ token:
 	t.expr = t.expr[to+1:]
 	return newToken(token)
 }
+
+func (t *tokeniser) isEmpty() bool {
+	t.expr = trim(t.expr)
+	return len(t.expr) == 0 || t.expr[0] == ' '
+}

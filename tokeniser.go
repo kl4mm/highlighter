@@ -7,14 +7,16 @@ import (
 )
 
 // Accepts MATCH(column) against (expression)
-// Returns (i, j) pairs of matches
+// Returns (i, len) pairs of matches
 // Optional apply (eg wrap in <b></b>, remove, replace etc)
 
-var stopwords = [33]string{
+var stopwords = []string{
 	"a", "an", "and", "are", "as", "at", "be", "but", "by", "for", "if", "in", "into", "is",
 	"it", "no", "not", "of", "on", "or", "such", "that", "the", "their", "then", "there",
 	"these", "they", "this", "to", "was", "will", "with",
 }
+
+var symbols = []string{Plus.String(), Minus.String(), LParen.String(), RParen.String(), Wildcard.String(), Tilde.String(), NotSymbol}
 
 type Token int
 
@@ -139,7 +141,7 @@ func (t *Tokeniser) Next() Token {
 
 token:
 	for i, r := range t.expr {
-		if slices.Contains([]string{Plus.String(), Minus.String(), LParen.String(), RParen.String(), Wildcard.String(), Tilde.String(), NotSymbol}, string(r)) {
+		if slices.Contains(symbols, string(r)) {
 			break
 		}
 

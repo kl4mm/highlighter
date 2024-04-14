@@ -140,7 +140,7 @@ func (t *tokeniser) peek() tokenData {
 
 	to := 0
 	if exprCopy[0] == '"' {
-		for i, r := range exprCopy {
+		for i, r := range exprCopy[1:] {
 			if r == '"' {
 				to = i
 				break

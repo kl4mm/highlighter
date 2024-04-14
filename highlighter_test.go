@@ -25,6 +25,7 @@ func Test_Parse(t *testing.T) {
 		{"!lorem AND !(ipsum AND !(dolor AND !(sit amet)))", []string{"dolor"}},
 		{"!lorem AND (ipsum AND !(dolor AND !(sit amet)))", []string{"ipsum", "sit", "amet"}},
 		{"!lorem AND (ipsum AND !!(dolor AND !(sit amet)))", []string{"ipsum", "dolor"}},
+		{"!\"lorem\" AND (\"ipsum\" AND !!(\"dolor\" AND !(\"sit\" \"amet\")))", []string{"ipsum", "dolor"}},
 	}
 
 	for _, tc := range tcs {

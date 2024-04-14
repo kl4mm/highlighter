@@ -81,3 +81,30 @@ func Test_SkipWhitespace(t *testing.T) {
 		})
 	}
 }
+
+func Test_Peek(t *testing.T) {
+	tcs := []struct {
+		input string
+		n     int
+		want  []tokenData
+	}{
+		{"\"lorem\" AND !\"ipsum\"", 4, []tokenData{{tokenPhrase, "lorem"}, {token: tokenAnd}, {token: tokenNot}, {tokenPhrase, "ipsum"}}},
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.input, func(t *testing.T) {
+			tokeniser := newTokeniser(tc.input)
+
+			have := make([]tokenData, tc.n)
+			for i := 0; i < tc.n; i++ {
+				have[i] = tokeniser.peek()
+				tokeniser.next()
+			}
+
+			if !reflect.DeepEqual(tc.want, have) {
+				t.Errorf("Want: %v, Have: %v", tc.want, have)
+			}
+		})
+	}
+
+}

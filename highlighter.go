@@ -6,7 +6,7 @@ import (
 )
 
 var ErrorUnexpectedEof = errors.New("unexpected eof")
-var ErrorUnexpectedToken = "unexpected eof: %v"
+var ErrorUnexpectedToken = errors.New("unexpected token")
 
 var stopwords = []string{
 	"a", "an", "and", "are", "as", "at", "be", "but", "by", "for", "if", "in", "into", "is",
@@ -72,7 +72,7 @@ func parseExpr(tokeniser *tokeniser, collect *[]string, parentNot bool) error {
 func parens(tokeniser *tokeniser, collect *[]string, parentNot bool, f func(*tokeniser, *[]string, bool) error) error {
 	l := tokeniser.next()
 	if l.token != tokenLParen {
-		return fmt.Errorf(ErrorUnexpectedToken, l.token)
+		return fmt.Errorf("%w: %v", ErrorUnexpectedToken, l.token)
 	}
 
 	if err := f(tokeniser, collect, parentNot); err != nil {
@@ -81,7 +81,7 @@ func parens(tokeniser *tokeniser, collect *[]string, parentNot bool, f func(*tok
 
 	r := tokeniser.next()
 	if r.token != tokenLParen {
-		return fmt.Errorf(ErrorUnexpectedToken, r.token)
+		return fmt.Errorf("%w: %v", ErrorUnexpectedToken, r.token)
 	}
 
 	return nil

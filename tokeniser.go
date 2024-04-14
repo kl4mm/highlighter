@@ -45,6 +45,7 @@ const (
 	tokenRParen
 	tokenWildcard
 	tokenTilde
+	tokenEof
 )
 
 func (t token) String() string {
@@ -130,8 +131,58 @@ func skipWhitespace(runes []rune) []rune {
 	return runes[from:]
 }
 
+func (t *tokeniser) peek() tokenData {
+	exprCopy := skipWhitespace(t.expr)
+
+	if len(exprCopy) == 0 {
+		return tokenData{token: tokenEof}
+	}
+
+	to := 0
+	if exprCopy[0] == '"' {
+		for i, r := range exprCopy {
+			if r == '"' {
+				to = i
+				break
+			}
+		}
+
+		// If we couldn't find the closing quote, then ignore it and find the next token
+		if to == 0 {
+			exprCopy = exprCopy[1:]
+			goto token
+		}
+
+		// Unquote
+		phrase := string(exprCopy[1 : to+1])
+
+		return tokenData{tokenPhrase, phrase}
+	}
+
+token:
+	for i, r := range exprCopy {
+		if slices.Contains(symbols, tokenLiteral(r)) {
+			break
+		}
+
+		if unicode.IsSpace(r) {
+			break
+		}
+
+		to = i
+	}
+
+	token := string(exprCopy[:to+1])
+	return newToken(token)
+}
+
+// TODO: since we're only checking the tokens peek(), this could just take a token to advance (rename to advance)
 func (t *tokeniser) next() tokenData {
 	t.expr = skipWhitespace(t.expr)
+
+	if len(t.expr) == 0 {
+		return tokenData{token: tokenEof}
+	}
 
 	to := 0
 	if t.expr[0] == '"' {
@@ -173,9 +224,4 @@ token:
 	token := string(t.expr[:to+1])
 	t.expr = t.expr[to+1:]
 	return newToken(token)
-}
-
-func (t *tokeniser) isEmpty() bool {
-	t.expr = skipWhitespace(t.expr)
-	return len(t.expr) == 0
 }

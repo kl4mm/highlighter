@@ -11,6 +11,8 @@ func Test_Tokeniser_Next(t *testing.T) {
 		n     int
 		want  []tokenData
 	}{
+		{"", 1, []tokenData{{token: tokenEof}}},
+		{"    ", 1, []tokenData{{token: tokenEof}}},
 		{"lorem", 1, []tokenData{{tokenWord, "lorem"}}},
 		{"AND", 1, []tokenData{{token: tokenAnd}}},
 		{"  AND   ", 1, []tokenData{{token: tokenAnd}}},

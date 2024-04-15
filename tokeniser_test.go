@@ -33,6 +33,7 @@ func Test_Tokeniser_Next(t *testing.T) {
 		{"~lorem", 1, []tokenData{{token: tokenTilde}}},
 		{"~lorem", 2, []tokenData{{token: tokenTilde}, {tokenWord, "lorem"}}},
 		{"~\"lorem\"", 2, []tokenData{{token: tokenTilde}, {tokenPhrase, "lorem"}}},
+		{"!\"ipsum\"", 2, []tokenData{{token: tokenNot}, {tokenPhrase, "ipsum"}}},
 		{"lorem AND ipsum", 3, []tokenData{{tokenWord, "lorem"}, {token: tokenAnd}, {tokenWord, "ipsum"}}},
 		{"   lorem    AND    ipsum   ", 3, []tokenData{{tokenWord, "lorem"}, {token: tokenAnd}, {tokenWord, "ipsum"}}},
 		{"\"lorem\" AND \"ipsum\"", 3, []tokenData{{tokenPhrase, "lorem"}, {token: tokenAnd}, {tokenPhrase, "ipsum"}}},
@@ -88,6 +89,15 @@ func Test_Peek(t *testing.T) {
 		n     int
 		want  []tokenData
 	}{
+		{"", 1, []tokenData{{token: tokenEof}}},
+		{"    ", 1, []tokenData{{token: tokenEof}}},
+		{"lorem", 1, []tokenData{{tokenWord, "lorem"}}},
+		{"lorem ipsum", 2, []tokenData{{tokenWord, "lorem"}, {tokenWord, "ipsum"}}},
+		{"lorem AND ipsum", 3, []tokenData{{tokenWord, "lorem"}, {token: tokenAnd}, {tokenWord, "ipsum"}}},
+		{"+\"ipsum\"", 2, []tokenData{{token: tokenPlus}, {tokenPhrase, "ipsum"}}},
+		{"NOT \"ipsum\"", 2, []tokenData{{token: tokenNot}, {tokenPhrase, "ipsum"}}},
+		{"-\"ipsum\"", 2, []tokenData{{token: tokenNot}, {tokenPhrase, "ipsum"}}},
+		{"!\"ipsum\"", 2, []tokenData{{token: tokenNot}, {tokenPhrase, "ipsum"}}},
 		{"\"lorem\" AND !\"ipsum\"", 4, []tokenData{{tokenPhrase, "lorem"}, {token: tokenAnd}, {token: tokenNot}, {tokenPhrase, "ipsum"}}},
 	}
 
@@ -98,7 +108,7 @@ func Test_Peek(t *testing.T) {
 			have := make([]tokenData, tc.n)
 			for i := 0; i < tc.n; i++ {
 				have[i] = tokeniser.peek()
-				tokeniser.next()
+				tokeniser.advance(have[i])
 			}
 
 			if !reflect.DeepEqual(tc.want, have) {
@@ -106,5 +116,4 @@ func Test_Peek(t *testing.T) {
 			}
 		})
 	}
-
 }

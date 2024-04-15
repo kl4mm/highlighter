@@ -70,6 +70,8 @@ func (t token) String() string {
 		return tokenLiteralWildcard.String()
 	case tokenTilde:
 		return tokenLiteralTilde.String()
+	case tokenEof:
+		return ""
 	}
 
 	panic("unreachable")
@@ -224,4 +226,28 @@ token:
 	token := string(t.expr[:to+1])
 	t.expr = t.expr[to+1:]
 	return newToken(token)
+}
+
+func (t *tokeniser) advance(td tokenData) {
+	t.expr = skipWhitespace(t.expr)
+
+	n := 0
+	switch td.token {
+	case tokenPhrase:
+		n = len(td.data) + 2
+	case tokenWord:
+		n = len(td.data)
+	case tokenNot:
+		// Symbols - and ! could be used as NOT
+		if t.expr[0] == '!' || t.expr[0] == '-' {
+			n = 1
+		} else {
+			n = len(td.token.String())
+		}
+		// TODO: would need to do a similar thing for AND/OR
+	default:
+		n = len(td.token.String())
+	}
+
+	t.expr = t.expr[n:]
 }

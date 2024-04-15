@@ -14,11 +14,7 @@ var stopwords = []string{
 	"these", "they", "this", "to", "was", "will", "with",
 }
 
-// Accepts MATCH(column,...) against (expression)
-// Returns (i, len) pairs of matches
-// Optional apply (eg wrap in <b></b>, remove, replace etc)
 func Highlight(inputs []string, expr string) {
-	// parse the expression and find the words/phrases in the inputs
 }
 
 func parse(expr string) ([]string, error) {
@@ -60,6 +56,7 @@ func parseExpr(tokeniser *tokeniser, collect *[]string, parentNot bool) error {
 			if parentNot && not {
 				childNot = false
 			}
+
 			return parens(tokeniser, collect, childNot, parseExpr)
 		}
 

@@ -151,6 +151,7 @@ func (t *tokeniser) peek() tokenData {
 
 		// If we couldn't find the closing quote, then ignore it and find the next token
 		if to == 0 {
+			t.expr = t.expr[1:] // Since advance() isn't aware of this
 			exprCopy = exprCopy[1:]
 			goto token
 		}
@@ -175,56 +176,6 @@ token:
 	}
 
 	token := string(exprCopy[:to+1])
-	return newToken(token)
-}
-
-// TODO: since we're only checking the tokens peek(), this could just take a token to advance (rename to advance)
-func (t *tokeniser) next() tokenData {
-	t.expr = skipWhitespace(t.expr)
-
-	if len(t.expr) == 0 {
-		return tokenData{token: tokenEof}
-	}
-
-	to := 0
-	if t.expr[0] == '"' {
-		for i, r := range t.expr[1:] {
-			if r == '"' {
-				to = i
-				break
-			}
-		}
-
-		// If we couldn't find the closing quote, then ignore it and find the next token
-		if to == 0 {
-			t.expr = t.expr[1:]
-			goto token
-		}
-
-		// Unquote
-		phrase := string(t.expr[1 : to+1])
-		// Quote
-		// phrase := string(t.expr[:to+2])
-
-		t.expr = t.expr[to+2:]
-		return tokenData{tokenPhrase, phrase}
-	}
-
-token:
-	for i, r := range t.expr {
-		if slices.Contains(symbols, tokenLiteral(r)) {
-			break
-		}
-
-		if unicode.IsSpace(r) {
-			break
-		}
-
-		to = i
-	}
-
-	token := string(t.expr[:to+1])
-	t.expr = t.expr[to+1:]
 	return newToken(token)
 }
 

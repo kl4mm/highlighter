@@ -28,20 +28,11 @@ func parse(expr string) ([]string, error) {
 	return collect, nil
 }
 
-// TODO: see if this can be made nicer
 func parseExpr(tokeniser *tokeniser, collect *[]string, parentNot bool) error {
-	// if parentNot, then any NOTs encountered in the subexpression should be accepted
-	// if !parentNot, then any NOTs encountered in the subexpression should be ignored
-
-	// TODO
-	// ignore ~, *
-	// need to be mindful of NOT and subexpressions
 	not := false
-	for tokeniser.peek().token != tokenEof {
-		td := tokeniser.peek()
-
-		// if a subexpression has a leading NOT, then any expressions within it that has a leading
-		// NOT should be treated as if it didn't have that NOT
+	for td := tokeniser.peek(); td.token != tokenEof; td = tokeniser.peek() {
+		// ignore ~, *
+		// if a subexpression has a leading NOT, then any leading NOTs within it should be ignored
 		if td.token == tokenNot {
 			not = !not
 		} else if ((parentNot && not) || !parentNot && !not) &&
@@ -60,26 +51,28 @@ func parseExpr(tokeniser *tokeniser, collect *[]string, parentNot bool) error {
 			return parens(tokeniser, collect, childNot, parseExpr)
 		}
 
-		tokeniser.next()
+		tokeniser.advance(td)
 	}
 
 	return nil
 }
 
 func parens(tokeniser *tokeniser, collect *[]string, parentNot bool, f func(*tokeniser, *[]string, bool) error) error {
-	l := tokeniser.next()
+	l := tokeniser.peek()
 	if l.token != tokenLParen {
 		return fmt.Errorf("%w: %v", ErrorUnexpectedToken, l.token)
 	}
+	tokeniser.advance(l)
 
 	if err := f(tokeniser, collect, parentNot); err != nil {
 		return err
 	}
 
-	r := tokeniser.next()
+	r := tokeniser.peek()
 	if r.token != tokenLParen {
 		return fmt.Errorf("%w: %v", ErrorUnexpectedToken, r.token)
 	}
+	tokeniser.advance(r)
 
 	return nil
 }
